@@ -42,43 +42,43 @@ class _HomePageState extends State<HomePage> {
           child: topHoriListView(),
         ),
         Expanded(
-            flex: 7,
-            child: Column(
-              children: <Widget>[
-                ExpansionTile(
-                  title: Text(
-                    '女裝',
-                  ),
+          flex: 7,
+          child: isSmall(context)
+              //小畫面時的View
+              ? SingleChildScrollView(
+                  child: Column(
                   children: [
-                    SizedBox(
-                      height: double.maxFinite,
-                      child: productVertiListView(),
-                    )
+                    ExpansionTile(
+                      title: Text('女裝'),
+                      children: <Widget>[
+                        productVertiListView(),
+                      ],
+                    ),
+                    ExpansionTile(
+                      title: Text('男裝'),
+                      children: <Widget>[
+                        productVertiListView(),
+                      ],
+                    ),
+                    ExpansionTile(
+                      title: Text('配件'),
+                      children: <Widget>[
+                        productVertiListView(),
+                      ],
+                    ),
                   ],
-                )
-              ],
-            ))
+                ))
+
+              //這是大畫面時的view
+              : Row(children: [
+                  Expanded(child: categoryVertiListView('女裝')),
+                  Expanded(child: categoryVertiListView('男裝')),
+                  Expanded(child: categoryVertiListView('配件')),
+                ]),
+        )
       ],
     );
   }
-
-
-  // Column(children: [
-            //   Container(child: categoryVertiListView('女裝'),),
-            //   Container(child: categoryVertiListView('男裝')),
-            //   Container(child: categoryVertiListView('配件')),
-            // ],)
-            
-
-
-//     //這是大畫面時的view
-            //     Row(children: [
-            //   Expanded(child: categoryVertiListView('女裝')),
-            //   Expanded(child: categoryVertiListView('男裝')),
-            //   Expanded(child: categoryVertiListView('配件')),
-            // ]),
-
-            
 
 // 上方水平畫面元件區
   Widget topImageCard() {
@@ -144,16 +144,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+//垂直商品卡片ListView
   Widget productVertiListView() {
     return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      physics: const NeverScrollableScrollPhysics(),
       itemCount: 6,
       itemBuilder: (context, index) => productCard(),
       padding: const EdgeInsets.all(5),
     );
   }
 
+//類別+商品卡ListView
   Widget categoryVertiListView(String category) {
     return Column(children: [
       Text(category),
