@@ -129,7 +129,15 @@ class _HomePageState extends State<HomePage> {
       physics: NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
       itemCount: 6,
-      itemBuilder: (context, index) => productCard(),
+      itemBuilder: (context, index) => InkWell(
+        child: productCard(),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const DetailPage(title: 'heyyy')));
+        },
+      ),
       padding: const EdgeInsets.all(5),
     );
   }
@@ -145,11 +153,27 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (context, index) => InkWell(
           child: productCard(),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailPage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const DetailPage(title: ('aaaa'))));
           },
         ),
         padding: const EdgeInsets.all(5),
       ))
     ]);
   }
+}
+
+class Product {
+  final String title;
+  final String id;
+  final Map<String, Map<String, int>> stock; // 使用 Map 來記錄每種顏色、尺寸的庫存
+  final String price;
+
+  Product(
+      {required this.title,
+      required this.id,
+      required this.stock,
+      required this.price});
 }
