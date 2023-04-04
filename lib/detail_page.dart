@@ -16,6 +16,10 @@ class _DetailPageState extends State<DetailPage> {
   int quantity = 1;
   late ValueChanged<int> onChanged;
 
+  bool isSmall(BuildContext context) {
+    return MediaQuery.of(context).size.width < 600;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,109 +33,188 @@ class _DetailPageState extends State<DetailPage> {
           backgroundColor: const Color(0xFFEEF1F7),
         ),
         body: SingleChildScrollView(
-          child: Container(
-              margin: const EdgeInsets.fromLTRB(80, 40, 80, 40),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          color: Colors.blue,
-                          width: double.infinity,
-                          height: 500,
-                        ),
-                      ),
-                      Expanded(
-                          child: Container(
-                              height: 500,
-                              width: double.infinity,
-                              margin: const EdgeInsets.only(left: 16),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      '商品名稱',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 24),
-                                    ),
-                                    const Text('貨號'),
-                                    const SizedBox(
-                                      height: 16,
-                                    ),
-                                    const Text('NT\$343'),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
-                                    const Divider(
-                                      color: Colors.grey,
-                                      thickness: 1,
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Text('顏色'),
-                                        straightLine(),
-                                        listColorCard(colorList)
-                                        // Container(height: 30, width: double.infinity, child: listColorCard(colorList),)
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Text('尺寸'),
-                                        straightLine(),
-                                        listSizeBtn(sizeList)
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 16,
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Text('數量'),
-                                        straightLine(),
-                                        quantityButton(
-                                          onChanged: (int value) {
-                                            1;
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 16,
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Colors.grey[800],
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.zero),
-                                        minimumSize: const Size(350, 60),
-                                      ),
-                                      onPressed: () {
-                                        // TODO: Add onPressed action
-                                      },
-                                      child: const Text('請選擇尺寸'),
-                                    ),
-                                    const SizedBox(
-                                      height: 16,
-                                    ),
-                                    const Text('實品顏色依單品照為主'),
-                                    const Text('棉100%'),
-                                    const Text('厚薄：薄'),
-                                    const Text('彈性：無'),
-                                    const Text('素材產地/日本'),
-                                    const Text('加工產地/日本'),
-                                  ],
-                                ),
-                              )))
-                    ],
+          child: isSmall(context) ? detailAppView() : detailWebView()
+        ));
+  }
+
+  Widget detailAppView() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(70, 40, 70, 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+        Container(
+          color: Colors.blue,
+          width: double.infinity,
+          height: 500,
+        ),
+        const Text(
+          '商品名稱',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+        const Text('貨號'),
+        const SizedBox(
+          height: 16,
+        ),
+        const Text('NT\$343'),
+        const SizedBox(
+          height: 8,
+        ),
+        const Divider(
+          color: Colors.grey,
+          thickness: 1,
+        ),
+        Row(
+          children: [
+            const Text('顏色'),
+            straightLine(),
+            listColorCard(colorList)
+          ],
+        ),
+        Row(
+          children: [const Text('尺寸'), straightLine(), listSizeBtn(sizeList)],
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        Row(
+          children: [
+            const Text('數量'),
+            straightLine(),
+            quantityButton(
+              onChanged: (int value) {
+                1;
+              },
+            ),
+          ],
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.grey[800],
+            shape:
+                const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            minimumSize: const Size(350, 60),
+          ),
+          onPressed: () {
+            // TODO: Add onPressed action
+          },
+          child: const Text('請選擇尺寸'),
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        const Text('實品顏色依單品照為主'),
+        const Text('棉100%'),
+        const Text('厚薄：薄'),
+        const Text('彈性：無'),
+        const Text('素材產地/日本'),
+        const Text('加工產地/日本'),
+        listPhoto()
+      ]),
+    );
+  }
+
+  Widget detailWebView() {
+    return Container(
+        margin: const EdgeInsets.fromLTRB(80, 40, 80, 40),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    color: Colors.blue,
+                    width: double.infinity,
+                    height: 500,
                   ),
-                  //下半段的文字及照片
-                  listPhoto()
-                ],
-              )),
+                ),
+                Expanded(
+                    child: Container(
+                        height: 500,
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(left: 16),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                '商品名稱',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 24),
+                              ),
+                              const Text('貨號'),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              const Text('NT\$343'),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              const Divider(
+                                color: Colors.grey,
+                                thickness: 1,
+                              ),
+                              Row(
+                                children: [
+                                  const Text('顏色'),
+                                  straightLine(),
+                                  listColorCard(colorList)
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text('尺寸'),
+                                  straightLine(),
+                                  listSizeBtn(sizeList)
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              Row(
+                                children: [
+                                  const Text('數量'),
+                                  straightLine(),
+                                  quantityButton(
+                                    onChanged: (int value) {
+                                      1;
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.grey[800],
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero),
+                                  minimumSize: const Size(350, 60),
+                                ),
+                                onPressed: () {
+                                  // TODO: Add onPressed action
+                                },
+                                child: const Text('請選擇尺寸'),
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              const Text('實品顏色依單品照為主'),
+                              const Text('棉100%'),
+                              const Text('厚薄：薄'),
+                              const Text('彈性：無'),
+                              const Text('素材產地/日本'),
+                              const Text('加工產地/日本'),
+                            ],
+                          ),
+                        )))
+              ],
+            ),
+            //下半段的文字及照片
+            listPhoto()
+          ],
         ));
   }
 
@@ -149,8 +232,6 @@ class _DetailPageState extends State<DetailPage> {
 
 //色卡選項
   Widget listColorCard(List<String> colorList) {
-    bool isSelected = false;
-
     return SizedBox(
       height: 30,
       width: 250,
@@ -159,22 +240,20 @@ class _DetailPageState extends State<DetailPage> {
           itemCount: colorList.length,
           shrinkWrap: true,
           itemBuilder: (context, index) => InkWell(
-            onTap: () {
-              setState(() {
-                isSelected = true;
-              });
-            },
-            child: SizedBox(
-                width: 30,
-                height: 30,
-                child: Card(
-                  shape:
-                      const RoundedRectangleBorder(borderRadius: BorderRadius.zero,),
-                  color: Color(int.parse('0xFF${colorList[index]}')),
+                onTap: () {
+                  setState(() {});
+                },
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: Card(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
+                    color: Color(int.parse('0xFF${colorList[index]}')),
+                  ),
                 ),
-              ),
-          )
-          ),
+              )),
     );
   }
 
@@ -194,14 +273,13 @@ class _DetailPageState extends State<DetailPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-                Text(
-                  '細部說明',
-                  style: TextStyle(
-                    foreground: Paint()..shader = linearGradient,
-                  ),
+              Text(
+                '細部說明',
+                style: TextStyle(
+                  foreground: Paint()..shader = linearGradient,
                 ),
-              const SizedBox(
-                width: 850,
+              ),
+             const Expanded(
                 child: Divider(
                   color: Colors.grey,
                   thickness: 1,
@@ -211,23 +289,25 @@ class _DetailPageState extends State<DetailPage> {
           ),
           const Text(
             'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
-             softWrap: true,
+            softWrap: true,
           ),
-          const SizedBox(height: 16,),
+          const SizedBox(
+            height: 16,
+          ),
           ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: 5,
-          shrinkWrap: true,
-          // ignore: prefer_const_constructors
-          itemBuilder: (context, index) => SizedBox(
-                width: double.infinity,
-                height: 500,
-                child: const Card(
-                  shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  color: Colors.blue,
-                ),
-              )),
+              scrollDirection: Axis.vertical,
+              itemCount: 5,
+              shrinkWrap: true,
+              // ignore: prefer_const_constructors
+              itemBuilder: (context, index) => SizedBox(
+                    width: double.infinity,
+                    height: 500,
+                    child: const Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero),
+                      color: Colors.blue,
+                    ),
+                  )),
         ],
       ),
     );
