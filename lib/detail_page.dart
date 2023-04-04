@@ -12,6 +12,10 @@ class _DetailPageState extends State<DetailPage> {
   List<String> colorList = ['697723', 'E36F10', 'C98E5D'];
   List<String> sizeList = ['S', 'M', "L"];
 
+  int selectedIndex = -1;
+  int quantity = 1;
+  late ValueChanged<int> onChanged;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +30,7 @@ class _DetailPageState extends State<DetailPage> {
         ),
         body: SingleChildScrollView(
           child: Container(
-              margin: EdgeInsets.fromLTRB(80, 40, 80, 40),
+              margin: const EdgeInsets.fromLTRB(80, 40, 80, 40),
               child: Column(
                 children: [
                   Row(
@@ -42,33 +46,33 @@ class _DetailPageState extends State<DetailPage> {
                           child: Container(
                               height: 500,
                               width: double.infinity,
-                              margin: EdgeInsets.only(left: 16),
+                              margin: const EdgeInsets.only(left: 16),
                               child: Align(
                                 alignment: Alignment.topLeft,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    const Text(
                                       '商品名稱',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 24),
                                     ),
-                                    Text('貨號'),
-                                    SizedBox(
+                                    const Text('貨號'),
+                                    const SizedBox(
                                       height: 16,
                                     ),
-                                    Text('NT\$343'),
-                                    SizedBox(
+                                    const Text('NT\$343'),
+                                    const SizedBox(
                                       height: 8,
                                     ),
-                                    Divider(
+                                    const Divider(
                                       color: Colors.grey,
                                       thickness: 1,
                                     ),
                                     Row(
                                       children: [
-                                        Text('顏色'),
+                                        const Text('顏色'),
                                         straightLine(),
                                         listColorCard(colorList)
                                         // Container(height: 30, width: double.infinity, child: listColorCard(colorList),)
@@ -76,49 +80,49 @@ class _DetailPageState extends State<DetailPage> {
                                     ),
                                     Row(
                                       children: [
-                                        Text('尺寸'),
+                                        const Text('尺寸'),
                                         straightLine(),
-                                        ListSizeBtn(sizeList)
+                                        listSizeBtn(sizeList)
                                       ],
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 16,
                                     ),
                                     Row(
                                       children: [
-                                        Text('數量'),
+                                        const Text('數量'),
                                         straightLine(),
-                                        QuantityButton(
+                                        quantityButton(
                                           onChanged: (int value) {
                                             1;
                                           },
                                         ),
                                       ],
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 16,
                                     ),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         primary: Colors.grey[800],
-                                        shape: RoundedRectangleBorder(
+                                        shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.zero),
-                                        minimumSize: Size(350, 60),
+                                        minimumSize: const Size(350, 60),
                                       ),
                                       onPressed: () {
                                         // TODO: Add onPressed action
                                       },
-                                      child: Text('請選擇尺寸'),
+                                      child: const Text('請選擇尺寸'),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 16,
                                     ),
-                                    Text('實品顏色依單品照為主'),
-                                    Text('棉100%'),
-                                    Text('厚薄：薄'),
-                                    Text('彈性：無'),
-                                    Text('素材產地/日本'),
-                                    Text('加工產地/日本'),
+                                    const Text('實品顏色依單品照為主'),
+                                    const Text('棉100%'),
+                                    const Text('厚薄：薄'),
+                                    const Text('彈性：無'),
+                                    const Text('素材產地/日本'),
+                                    const Text('加工產地/日本'),
                                   ],
                                 ),
                               )))
@@ -131,18 +135,22 @@ class _DetailPageState extends State<DetailPage> {
         ));
   }
 
+//水平直線
   Widget straightLine() {
-    return Container(
+    return const SizedBox(
       height: 20,
       width: 50,
-      child: const VerticalDivider(
+      child: VerticalDivider(
         color: Colors.grey,
         thickness: 1,
       ),
     );
   }
 
+//色卡選項
   Widget listColorCard(List<String> colorList) {
+    bool isSelected = false;
+
     return SizedBox(
       height: 30,
       width: 250,
@@ -150,24 +158,33 @@ class _DetailPageState extends State<DetailPage> {
           scrollDirection: Axis.horizontal,
           itemCount: colorList.length,
           shrinkWrap: true,
-          itemBuilder: (context, index) => SizedBox(
+          itemBuilder: (context, index) => InkWell(
+            onTap: () {
+              setState(() {
+                isSelected = true;
+              });
+            },
+            child: SizedBox(
                 width: 30,
                 height: 30,
                 child: Card(
                   shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      const RoundedRectangleBorder(borderRadius: BorderRadius.zero,),
                   color: Color(int.parse('0xFF${colorList[index]}')),
                 ),
-              )),
+              ),
+          )
+          ),
     );
   }
 
+//網頁下方畫面
   Widget listPhoto() {
     Shader linearGradient = const LinearGradient(
       colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
-    ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
+    ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Column(
         children: [
@@ -183,7 +200,7 @@ class _DetailPageState extends State<DetailPage> {
                     foreground: Paint()..shader = linearGradient,
                   ),
                 ),
-              Container(
+              const SizedBox(
                 width: 850,
                 child: Divider(
                   color: Colors.grey,
@@ -192,21 +209,20 @@ class _DetailPageState extends State<DetailPage> {
               )
             ],
           ),
-          Container(
-            child: Text(
-              'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
-               softWrap: true,
-            ),
+          const Text(
+            'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
+             softWrap: true,
           ),
-          SizedBox(height: 16,),
+          const SizedBox(height: 16,),
           ListView.builder(
           scrollDirection: Axis.vertical,
           itemCount: 5,
           shrinkWrap: true,
+          // ignore: prefer_const_constructors
           itemBuilder: (context, index) => SizedBox(
                 width: double.infinity,
                 height: 500,
-                child: Card(
+                child: const Card(
                   shape:
                       RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                   color: Colors.blue,
@@ -216,28 +232,15 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
-}
 
-class ListSizeBtn extends StatefulWidget {
-  final List<String> sizeList;
-
-  ListSizeBtn(this.sizeList, {Key? key}) : super(key: key);
-
-  @override
-  _ListSizeBtnState createState() => _ListSizeBtnState();
-}
-
-class _ListSizeBtnState extends State<ListSizeBtn> {
-  int _selectedIndex = -1;
-
-  @override
-  Widget build(BuildContext context) {
+//尺寸按鈕
+  Widget listSizeBtn(List<String> sizeList) {
     return SizedBox(
       height: 30,
       width: 250,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: widget.sizeList.length,
+        itemCount: sizeList.length,
         shrinkWrap: true,
         separatorBuilder: (BuildContext context, int index) {
           return const SizedBox(
@@ -247,68 +250,47 @@ class _ListSizeBtnState extends State<ListSizeBtn> {
         itemBuilder: (context, index) => ElevatedButton(
           style: ElevatedButton.styleFrom(
             primary:
-                _selectedIndex == index ? Colors.grey[400] : Colors.grey[700],
+                selectedIndex == index ? Colors.grey[400] : Colors.grey[700],
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20), // 設置圓角半徑
             ),
           ),
-          child: Text(widget.sizeList[index]),
+          child: Text(sizeList[index]),
           onPressed: () {
             setState(() {
-              _selectedIndex = index;
+              selectedIndex = index;
             });
           },
         ),
       ),
     );
   }
-}
 
-class QuantityButton extends StatefulWidget {
-  final int quantity;
-  final ValueChanged<int> onChanged;
-
-  QuantityButton({Key? key, this.quantity = 1, required this.onChanged})
-      : super(key: key);
-
-  @override
-  _QuantityButtonState createState() => _QuantityButtonState();
-}
-
-class _QuantityButtonState extends State<QuantityButton> {
-  late int _quantity;
-
-  @override
-  void initState() {
-    super.initState();
-    _quantity = widget.quantity;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
+//數量按鈕
+  Widget quantityButton({required Null Function(int value) onChanged}) {
+    return SizedBox(
       width: 250,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           IconButton(
-            icon: Icon(Icons.remove_circle),
+            icon: const Icon(Icons.remove_circle),
             onPressed: () {
-              if (_quantity > 1) {
+              if (quantity > 1) {
                 setState(() {
-                  _quantity--;
-                  widget.onChanged(_quantity);
+                  quantity--;
+                  onChanged(quantity);
                 });
               }
             },
           ),
-          Text('$_quantity'),
+          Text('$quantity'),
           IconButton(
-            icon: Icon(Icons.add_circle),
+            icon: const Icon(Icons.add_circle),
             onPressed: () {
               setState(() {
-                _quantity++;
-                widget.onChanged(_quantity);
+                quantity++;
+                onChanged(quantity);
               });
             },
           ),
