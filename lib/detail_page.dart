@@ -1,23 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:stylish_flutter/home_page.dart';
 
 class DetailPage extends StatefulWidget {
-  final String title;
-  const DetailPage({super.key, required this.title});
+  final Product product;
+  const DetailPage({super.key, required this.product});
+  
 
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
-  List<String> colorList = ['697723', 'E36F10', 'C98E5D'];
-  List<String> sizeList = ['S', 'M', "L"];
-
-  int selectedIndex = -1;
+  int sizeSelectedIndex = -1;
+  int colorSelectedIndex = -1;
+  String colorSelect = '';
   int quantity = 1;
   late ValueChanged<int> onChanged;
 
+  late List<String> colorList;
+  late List<String> sizeList;
+  
   bool isSmall(BuildContext context) {
     return MediaQuery.of(context).size.width < 600;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    colorList = widget.product.stock.keys.toList();
+    sizeList = <String>[];
+    widget.product.stock.forEach((key, value) {
+      value.forEach((size, count) {
+        if (!sizeList.contains(size)) {
+          sizeList.add(size);
+        }
+      });
+    });
   }
 
   @override
@@ -48,15 +66,15 @@ class _DetailPageState extends State<DetailPage> {
           width: double.infinity,
           height: 500,
         ),
-        const Text(
-          '商品名稱',
+        Text(
+          widget.product.title,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
-        const Text('貨號'),
+        Text(widget.product.id),
         const SizedBox(
           height: 16,
         ),
-        const Text('NT\$343'),
+        Text('NT\$ ${widget.product.price}'),
         const SizedBox(
           height: 8,
         ),
@@ -138,16 +156,16 @@ class _DetailPageState extends State<DetailPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                '商品名稱',
+                              Text(
+                                widget.product.title,
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 24),
                               ),
-                              const Text('貨號'),
+                              Text(widget.product.id,),
                               const SizedBox(
                                 height: 16,
                               ),
-                              const Text('NT\$343'),
+                              Text('NT\$ ${widget.product.price}'),
                               const SizedBox(
                                 height: 8,
                               ),
@@ -241,16 +259,29 @@ class _DetailPageState extends State<DetailPage> {
           shrinkWrap: true,
           itemBuilder: (context, index) => InkWell(
                 onTap: () {
-                  setState(() {});
+                  setState(() {
+                    colorSelectedIndex = index;
+                    colorSelect = colorList[index];
+                  });
                 },
-                child: SizedBox(
+                child: Container(
                   width: 30,
                   height: 30,
-                  child: Card(
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
+                  decoration: BoxDecoration(
+                    border: colorSelectedIndex == index
+                        ? Border.all(color: Colors.red, width: 2)
+                        : null,
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Card(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      color: Color(int.parse('0xFF${colorList[index]}')),
                     ),
-                    color: Color(int.parse('0xFF${colorList[index]}')),
                   ),
                 ),
               )),
@@ -319,30 +350,78 @@ class _DetailPageState extends State<DetailPage> {
       height: 30,
       width: 250,
       child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: sizeList.length,
-        shrinkWrap: true,
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(
-            width: 6,
-          );
-        },
-        itemBuilder: (context, index) => ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary:
-                selectedIndex == index ? Colors.grey[400] : Colors.grey[700],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // 設置圓角半徑
-            ),
-          ),
-          child: Text(sizeList[index]),
-          onPressed: () {
-            setState(() {
-              selectedIndex = index;
-            });
+          scrollDirection: Axis.horizontal,
+          itemCount: sizeList.length,
+          shrinkWrap: true,
+          separatorBuilder: (BuildContext context, int index) {
+            return const SizedBox(
+              width: 6,
+            );
           },
-        ),
-      ),
+          itemBuilder: (ontext, index) {
+            final size = sizeList[index];
+            // final stock = widget.product.stock[colorSelect]![size] ?? 0;
+            final stock =
+                widget.product.stock[colorSelect]?.containsKey(size) == true
+                    ? widget.product.stock[colorSelect]![size]
+                    : 0;
+
+            if (colorSelect == '') {
+              return ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.grey[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(size),
+                onPressed: () => {},
+              );
+            } else if (stock! > 0) {
+              return ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: sizeSelectedIndex == index
+                      ? Colors.grey[400]
+                      : Colors.grey[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(size),
+                onPressed: () {
+                  setState(() {
+                    sizeSelectedIndex = index;
+                  });
+                },
+              );
+            } else {
+              return Stack(
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.grey[700],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: null,
+                    child: Text(size),
+                  ),
+                  const Positioned(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'X',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    top: 30/2-8,
+                    left: 60/2-8,
+                  ),
+                ],
+              );
+            }
+          }),
     );
   }
 

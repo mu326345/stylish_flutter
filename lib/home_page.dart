@@ -11,6 +11,82 @@ class _HomePageState extends State<HomePage> {
     return MediaQuery.of(context).size.width < 600;
   }
 
+  //假資料
+  final List<Product> products = [
+    Product(
+        title: '男士休閒外套',
+        id: 'men_jacket_001',
+        category: 'Men',
+        stock: {
+          '697723': {'M': 0, 'L': 20},
+          'E36F10': {'M': 5, 'L': 15},
+        },
+        price: '1500'),
+    Product(
+        title: '男士休閒上衣',
+        id: 'men_jacket_002',
+        category: 'Men',
+        stock: {
+          'E36F10': {'M': 10, 'L': 20},
+          'C98E5D': {'M': 5, 'L': 15},
+          '697723': {'M': 0, 'L': 5},
+        },
+        price: '1500'),
+    Product(
+        title: '女士迷你洋裝',
+        id: 'women_dress_003',
+        category: 'Women',
+        stock: {
+          'C98E5D': {'S': 15, 'M': 10},
+        },
+        price: '1200'),
+    Product(
+        title: '女士迷你洋裝',
+        id: 'women_dress_004',
+        category: 'Women',
+        stock: {
+          'C98E5D': {'S': 15, 'M': 10},
+          'E36F10': {'M': 10, 'L': 20},
+          '697723': {'M': 0, 'L': 5},
+        },
+        price: '1200'),
+    Product(
+        title: '女士迷你洋裝',
+        id: 'women_dress_001',
+        category: 'Women',
+        stock: {
+          'C98E5D': {'S': 15, 'M': 10},
+          '697723': {'M': 0, 'L': 5},
+        },
+        price: '1200'),
+    Product(
+        title: '女士迷你洋裝2',
+        id: 'women_dress_002',
+        category: 'Women',
+        stock: {
+          'E36F10': {'S': 15, 'M': 10},
+          '697723': {'S': 5, 'M': 0},
+        },
+        price: '1200'),
+    Product(
+        title: '經典手錶',
+        id: 'watch_001',
+        category: 'Access',
+        stock: {
+          'C98E5D': {'F': 0},
+          'E36F10': {'F': 20},
+        },
+        price: '5000'),
+    Product(
+        title: '經典手錶2',
+        id: 'watch_002',
+        category: 'Access',
+        stock: {
+          'C98E5D': {'F': 50},
+        },
+        price: '5000'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -29,19 +105,19 @@ class _HomePageState extends State<HomePage> {
                     ExpansionTile(
                       title: Text('女裝'),
                       children: <Widget>[
-                        productVertiListView(),
+                        productVertiListView('Women', products),
                       ],
                     ),
                     ExpansionTile(
                       title: Text('男裝'),
                       children: <Widget>[
-                        productVertiListView(),
+                        productVertiListView('Men', products),
                       ],
                     ),
                     ExpansionTile(
                       title: Text('配件'),
                       children: <Widget>[
-                        productVertiListView(),
+                        productVertiListView('Access', products),
                       ],
                     ),
                   ],
@@ -49,9 +125,9 @@ class _HomePageState extends State<HomePage> {
 
               //這是大畫面時的view
               : Row(children: [
-                  Expanded(child: categoryVertiListView('女裝')),
-                  Expanded(child: categoryVertiListView('男裝')),
-                  Expanded(child: categoryVertiListView('配件')),
+                  Expanded(child: categoryVertiListView('Women', products)),
+                  Expanded(child: categoryVertiListView('Men', products)),
+                  Expanded(child: categoryVertiListView('Access', products)),
                 ]),
         )
       ],
@@ -86,8 +162,8 @@ class _HomePageState extends State<HomePage> {
   }
 
 //下方畫面元件區
-  Widget productCard() {
-    return Container(
+  Widget productCard(Product product) {
+    return SizedBox(
       width: 300,
       height: 180,
       child: Card(
@@ -99,7 +175,7 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                   flex: 4,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
@@ -114,7 +190,10 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [Text('Uniqlo is good'), Text('NT\$ 343')],
+                      children: [
+                        Text(product.title),
+                        Text('NT\$ ${product.price}')
+                      ],
                     ),
                   ))
             ],
@@ -123,19 +202,22 @@ class _HomePageState extends State<HomePage> {
   }
 
 //垂直商品卡片ListView
-  Widget productVertiListView() {
+  Widget productVertiListView(String category, List<Product> products) {
+    var filterProducts =
+        products.where((product) => product.category == category).toList();
+
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      itemCount: 6,
+      itemCount: filterProducts.length,
       itemBuilder: (context, index) => InkWell(
-        child: productCard(),
+        child: productCard(filterProducts[index]),
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const DetailPage(title: 'heyyy')));
+                  builder: (context) => DetailPage(product: filterProducts[index],)));
         },
       ),
       padding: const EdgeInsets.all(5),
@@ -143,20 +225,23 @@ class _HomePageState extends State<HomePage> {
   }
 
 //類別+商品卡ListView
-  Widget categoryVertiListView(String category) {
+  Widget categoryVertiListView(String category, List<Product> products) {
+    var filterProducts = products.where((product) => product.category == category).toList();
+    String categoryText = category == 'Men'? '男裝': category == 'Women'? '女裝': category == 'Access'? '配件': '';
+
     return Column(children: [
-      Text(category),
+      Text(categoryText),
       Expanded(
           child: ListView.builder(
         scrollDirection: Axis.vertical,
-        itemCount: 6,
+        itemCount: filterProducts.length,
         itemBuilder: (context, index) => InkWell(
-          child: productCard(),
+          child: productCard(filterProducts[index]),
           onTap: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const DetailPage(title: ('aaaa'))));
+                    builder: (context) => DetailPage(product: filterProducts[index])));
           },
         ),
         padding: const EdgeInsets.all(5),
@@ -168,12 +253,14 @@ class _HomePageState extends State<HomePage> {
 class Product {
   final String title;
   final String id;
+  final String category;
   final Map<String, Map<String, int>> stock; // 使用 Map 來記錄每種顏色、尺寸的庫存
   final String price;
 
   Product(
       {required this.title,
       required this.id,
+      required this.category,
       required this.stock,
       required this.price});
 }
