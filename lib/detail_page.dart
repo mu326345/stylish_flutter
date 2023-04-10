@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stylish_flutter/home_page.dart';
+import 'models/product.dart';
 
 class DetailPage extends StatefulWidget {
   final Product product;
@@ -288,62 +289,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-//網頁下方畫面
-  Widget listPhoto() {
-    Shader linearGradient = const LinearGradient(
-      colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
-    ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
-
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 16,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '細部說明',
-                style: TextStyle(
-                  foreground: Paint()..shader = linearGradient,
-                ),
-              ),
-             const Expanded(
-                child: Divider(
-                  color: Colors.grey,
-                  thickness: 1,
-                ),
-              )
-            ],
-          ),
-          const Text(
-            'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
-            softWrap: true,
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          ListView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: 5,
-              shrinkWrap: true,
-              // ignore: prefer_const_constructors
-              itemBuilder: (context, index) => SizedBox(
-                    width: double.infinity,
-                    height: 500,
-                    child: const Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero),
-                      color: Colors.blue,
-                    ),
-                  )),
-        ],
-      ),
-    );
-  }
-
 //尺寸按鈕
   Widget listSizeBtn(List<String> sizeList) {
     return SizedBox(
@@ -458,3 +403,59 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 }
+
+//網頁下方畫面
+  Widget listPhoto() {
+    Shader linearGradient = const LinearGradient(
+      colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
+    ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
+
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          const SizedBox(
+            height: 16,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '細部說明',
+                style: TextStyle(
+                  foreground: Paint()..shader = linearGradient,
+                ),
+              ),
+             const Expanded(
+                child: Divider(
+                  color: Colors.grey,
+                  thickness: 1,
+                ),
+              )
+            ],
+          ),
+          const Text(
+            'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
+            softWrap: true,
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          ListView.builder(
+              scrollDirection: Axis.vertical,
+              itemCount: 5,
+              shrinkWrap: true,
+              // ignore: prefer_const_constructors
+              itemBuilder: (context, index) => SizedBox(
+                    width: double.infinity,
+                    height: 500,
+                    child: const Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero),
+                      color: Colors.blue,
+                    ),
+                  )),
+        ],
+      ),
+    );
+  }
