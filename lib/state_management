@@ -1,0 +1,21 @@
+State Managment
+目的：
+1. 提供Data 的存取權
+2. 指示Widget 在數據變動時重新繪製
+狀態：臨時ephemeral/應用app
+- 臨時(UI狀態) - 僅與Widget相關，不需要State來管理，使用StatefulWidget就足夠。畫面在資料更改時需要重建。
+	- 當前頁面
+- 應用(共享狀態) - 跨多個Widget，在用戶使用期間會需要保留的狀態。
+	- 購物車項目
+方法：
+	Inherited Widget(Flutter原生)、Bloc、Cubit
+
+Bloc & Cubit 差異：
+	Bloc - event、bloc、state 三種組成，yield 是作為輸出狀態的指令。需要實現mapEventToState來處理事件並產生新的狀態。
+	Cubit - function、state 兩種組成，emit 作為輸出狀態。相較Bloc少了Event。
+	相同部分 - 當觸發新的狀態， blocBuilder 會重新建立
+
+Bloc 需要有 Event, Bloc,  State
+	Event - 觸發事件，傳遞到Bloc
+	Bloc - 處理邏輯，接收觸發事件執行業務邏輯
+	State - 當前狀態，Bloc執行業務後發出新狀態，Widget會根據狀態變化進行更新
