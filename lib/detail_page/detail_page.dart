@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stylish_flutter/detail_page/detail_bloc.dart';
+import 'package:stylish_flutter/detail_page/detail_event.dart';
+import 'package:stylish_flutter/detail_page/detail_state.dart';
 import 'package:stylish_flutter/home_page.dart';
-import 'models/product.dart';
+import '../models/product.dart';
 
 class DetailPage extends StatefulWidget {
   final Product product;
   const DetailPage({super.key, required this.product});
-  
 
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final bloc = DetailBloc();
+
   int sizeSelectedIndex = -1;
-  int colorSelectedIndex = -1;
+  // int colorSelectedIndex = -1;
   String colorSelect = '';
   int quantity = 1;
   late ValueChanged<int> onChanged;
 
   late List<String> colorList;
   late List<String> sizeList;
-  
+
   bool isSmall(BuildContext context) {
     return MediaQuery.of(context).size.width < 600;
   }
@@ -52,16 +57,13 @@ class _DetailPageState extends State<DetailPage> {
           backgroundColor: const Color(0xFFEEF1F7),
         ),
         body: SingleChildScrollView(
-          child: isSmall(context) ? detailAppView() : detailWebView()
-        ));
+            child: isSmall(context) ? detailAppView() : detailWebView()));
   }
 
   Widget detailAppView() {
     return Container(
       margin: const EdgeInsets.fromLTRB(70, 40, 70, 40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           color: Colors.blue,
           width: double.infinity,
@@ -83,13 +85,14 @@ class _DetailPageState extends State<DetailPage> {
           color: Colors.grey,
           thickness: 1,
         ),
-        Row(
-          children: [
-            const Text('顏色'),
-            straightLine(),
-            listColorCard(colorList)
-          ],
-        ),
+        listColorCard(colorList),
+        // Row(
+        //   children: [
+        //     const Text('顏色'),
+        //     straightLine(),
+        //     listColorCard(colorList)
+        //   ],
+        // ),
         Row(
           children: [const Text('尺寸'), straightLine(), listSizeBtn(sizeList)],
         ),
@@ -162,7 +165,9 @@ class _DetailPageState extends State<DetailPage> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 24),
                               ),
-                              Text(widget.product.id,),
+                              Text(
+                                widget.product.id,
+                              ),
                               const SizedBox(
                                 height: 16,
                               ),
@@ -174,13 +179,14 @@ class _DetailPageState extends State<DetailPage> {
                                 color: Colors.grey,
                                 thickness: 1,
                               ),
-                              Row(
-                                children: [
-                                  const Text('顏色'),
-                                  straightLine(),
-                                  listColorCard(colorList)
-                                ],
-                              ),
+                              listColorCard(colorList),
+                              // Row(
+                              //   children: [
+                              //     const Text('顏色'),
+                              //     straightLine(),
+                              //     listColorCard(colorList)
+                              //   ],
+                              // ),
                               Row(
                                 children: [
                                   const Text('尺寸'),
@@ -251,42 +257,102 @@ class _DetailPageState extends State<DetailPage> {
 
 //色卡選項
   Widget listColorCard(List<String> colorList) {
-    return SizedBox(
-      height: 30,
-      width: 250,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: colorList.length,
-          shrinkWrap: true,
-          itemBuilder: (context, index) => InkWell(
-                onTap: () {
-                  setState(() {
-                    colorSelectedIndex = index;
-                    colorSelect = colorList[index];
-                  });
-                },
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    border: colorSelectedIndex == index
-                        ? Border.all(color: Colors.red, width: 2)
-                        : null,
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Card(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
-                      ),
-                      color: Color(int.parse('0xFF${colorList[index]}')),
-                    ),
-                  ),
-                ),
-              )),
-    );
+    return BlocProvider(
+        create: (_) => DetailBloc(),
+        child: Row(
+          children: [
+            const Text('顏色'),
+            straightLine(),
+            SizedBox(
+                height: 30,
+                width: 250,
+                child: BlocBuilder<DetailBloc, DetailState>(
+                  builder: (context, state) {
+                    return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: colorList.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => InkWell(
+                              onTap: () {
+                                context
+                                    .read<DetailBloc>()
+                                    .add(ColorSelect(index));
+                              },
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                //選擇後狀態變動
+                                // child: Card(
+                                //   shape: state.selectedColorIndex == index
+                                //       ? const RoundedRectangleBorder(
+                                //           side: BorderSide(
+                                //               color: Colors.red, width: 2),
+                                //           borderRadius: BorderRadius.zero,
+                                //         )
+                                //       : const RoundedRectangleBorder(
+                                //           borderRadius: BorderRadius.zero),
+                                //色號方塊
+                                child: SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: Card(
+                                    shape: state.selectedColorIndex == index
+                                        ? const RoundedRectangleBorder(
+                                            side: BorderSide(
+                                                color: Colors.red, width: 2),
+                                            borderRadius: BorderRadius.zero,
+                                          )
+                                        : const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.zero,
+                                          ),
+                                    color: Color(
+                                        int.parse('0xFF${colorList[index]}')),
+                                  ),
+                                ),
+                                // ),
+                              ),
+                            ));
+                  },
+                ))
+          ],
+        ));
+    // return
+    // SizedBox(
+    //   height: 30,
+    //   width: 250,
+    //   child: ListView.builder(
+    //       scrollDirection: Axis.horizontal,
+    //       itemCount: colorList.length,
+    //       shrinkWrap: true,
+    //       itemBuilder: (context, index) => InkWell(
+    //             onTap: () {
+    //               setState(() {
+    //                 colorSelectedIndex = index;
+    //                 colorSelect = colorList[index];
+    //               });
+    //             },
+    //             child: Container(
+    //               width: 30,
+    //               height: 30,
+    //               decoration: BoxDecoration(
+    //                 border: colorSelectedIndex == index
+    //                     ? Border.all(color: Colors.red, width: 2)
+    //                     : null,
+    //                 borderRadius: BorderRadius.zero,
+    //               ),
+    //               child: SizedBox(
+    //                 width: 30,
+    //                 height: 30,
+    //                 child: Card(
+    //                   shape: const RoundedRectangleBorder(
+    //                     borderRadius: BorderRadius.zero,
+    //                   ),
+    //                   color: Color(int.parse('0xFF${colorList[index]}')),
+    //                 ),
+    //               ),
+    //             ),
+    //           )),
+    // );
   }
 
 //尺寸按鈕
@@ -360,8 +426,8 @@ class _DetailPageState extends State<DetailPage> {
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
-                    top: 30/2-8,
-                    left: 60/2-8,
+                    top: 30 / 2 - 8,
+                    left: 60 / 2 - 8,
                   ),
                 ],
               );
@@ -405,57 +471,57 @@ class _DetailPageState extends State<DetailPage> {
 }
 
 //網頁下方畫面
-  Widget listPhoto() {
-    Shader linearGradient = const LinearGradient(
-      colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
-    ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
+Widget listPhoto() {
+  Shader linearGradient = const LinearGradient(
+    colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
+  ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 16,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '細部說明',
-                style: TextStyle(
-                  foreground: Paint()..shader = linearGradient,
-                ),
+  return SizedBox(
+    width: double.infinity,
+    child: Column(
+      children: [
+        const SizedBox(
+          height: 16,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '細部說明',
+              style: TextStyle(
+                foreground: Paint()..shader = linearGradient,
               ),
-             const Expanded(
-                child: Divider(
-                  color: Colors.grey,
-                  thickness: 1,
-                ),
-              )
-            ],
-          ),
-          const Text(
-            'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
-            softWrap: true,
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          ListView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: 5,
-              shrinkWrap: true,
-              // ignore: prefer_const_constructors
-              itemBuilder: (context, index) => SizedBox(
-                    width: double.infinity,
-                    height: 500,
-                    child: const Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero),
-                      color: Colors.blue,
-                    ),
-                  )),
-        ],
-      ),
-    );
-  }
+            ),
+            const Expanded(
+              child: Divider(
+                color: Colors.grey,
+                thickness: 1,
+              ),
+            )
+          ],
+        ),
+        const Text(
+          'O.N.S is all about options, which is why we took our staple polo shirt and upgraded it with slubby linen jersey, making it even lighter for those who perfer their summer style extra-breezy.',
+          softWrap: true,
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: 5,
+            shrinkWrap: true,
+            // ignore: prefer_const_constructors
+            itemBuilder: (context, index) => SizedBox(
+                  width: double.infinity,
+                  height: 500,
+                  child: const Card(
+                    shape:
+                        RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    color: Colors.blue,
+                  ),
+                )),
+      ],
+    ),
+  );
+}

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stylish_flutter/detail_page.dart';
+import 'package:stylish_flutter/detail_page/detail_page.dart';
 import 'package:stylish_flutter/models/product.dart';
 
 class HomePage extends StatefulWidget {
@@ -218,7 +218,9 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DetailPage(product: filterProducts[index],)));
+                  builder: (context) => DetailPage(
+                        product: filterProducts[index],
+                      )));
         },
       ),
       padding: const EdgeInsets.all(5),
@@ -227,8 +229,15 @@ class _HomePageState extends State<HomePage> {
 
 //類別+商品卡ListView
   Widget categoryVertiListView(String category, List<Product> products) {
-    var filterProducts = products.where((product) => product.category == category).toList();
-    String categoryText = category == 'Men'? '男裝': category == 'Women'? '女裝': category == 'Access'? '配件': '';
+    var filterProducts =
+        products.where((product) => product.category == category).toList();
+    String categoryText = category == 'Men'
+        ? '男裝'
+        : category == 'Women'
+            ? '女裝'
+            : category == 'Access'
+                ? '配件'
+                : '';
 
     return Column(children: [
       Text(categoryText),
@@ -242,7 +251,8 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DetailPage(product: filterProducts[index])));
+                    builder: (context) =>
+                        DetailPage(product: filterProducts[index])));
           },
         ),
         padding: const EdgeInsets.all(5),
