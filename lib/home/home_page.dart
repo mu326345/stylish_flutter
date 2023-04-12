@@ -1,5 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:stylish_flutter/detail_page/detail_page.dart';
+import 'package:stylish_flutter/detail/detail_page.dart';
 import 'package:stylish_flutter/models/product.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,6 +12,13 @@ class _HomePageState extends State<HomePage> {
   bool isSmall(BuildContext context) {
     return MediaQuery.of(context).size.width < 600;
   }
+
+  final dio = Dio();
+  void getHttp() async {
+    final response = await dio.get('https://api.appworks-school.tw/api/1.0/products/women');
+    // print(response);
+    print('go here!!');
+}
 
   //假資料
   final List<Product> products = [
@@ -164,6 +172,7 @@ class _HomePageState extends State<HomePage> {
 
 //下方畫面元件區
   Widget productCard(Product product) {
+    getHttp();
     return SizedBox(
       width: 300,
       height: 180,

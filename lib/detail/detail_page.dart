@@ -86,13 +86,6 @@ class _DetailPageState extends State<DetailPage> {
           thickness: 1,
         ),
         listColorCard(colorList),
-        // Row(
-        //   children: [
-        //     const Text('顏色'),
-        //     straightLine(),
-        //     listColorCard(colorList)
-        //   ],
-        // ),
         Row(
           children: [const Text('尺寸'), straightLine(), listSizeBtn(sizeList)],
         ),
@@ -180,13 +173,6 @@ class _DetailPageState extends State<DetailPage> {
                                 thickness: 1,
                               ),
                               listColorCard(colorList),
-                              // Row(
-                              //   children: [
-                              //     const Text('顏色'),
-                              //     straightLine(),
-                              //     listColorCard(colorList)
-                              //   ],
-                              // ),
                               Row(
                                 children: [
                                   const Text('尺寸'),
@@ -278,81 +264,29 @@ class _DetailPageState extends State<DetailPage> {
                                     .read<DetailBloc>()
                                     .add(ColorSelect(index));
                               },
-                              child: Container(
+                              //色號方塊
+                              child: SizedBox(
                                 width: 30,
                                 height: 30,
-                                //選擇後狀態變動
-                                // child: Card(
-                                //   shape: state.selectedColorIndex == index
-                                //       ? const RoundedRectangleBorder(
-                                //           side: BorderSide(
-                                //               color: Colors.red, width: 2),
-                                //           borderRadius: BorderRadius.zero,
-                                //         )
-                                //       : const RoundedRectangleBorder(
-                                //           borderRadius: BorderRadius.zero),
-                                //色號方塊
-                                child: SizedBox(
-                                  width: 30,
-                                  height: 30,
-                                  child: Card(
-                                    shape: state.selectedColorIndex == index
-                                        ? const RoundedRectangleBorder(
-                                            side: BorderSide(
-                                                color: Colors.red, width: 2),
-                                            borderRadius: BorderRadius.zero,
-                                          )
-                                        : const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.zero,
-                                          ),
-                                    color: Color(
-                                        int.parse('0xFF${colorList[index]}')),
-                                  ),
+                                child: Card(
+                                  shape: state.selectedColorIndex == index
+                                      ? const RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              color: Colors.red, width: 2),
+                                          borderRadius: BorderRadius.zero,
+                                        )
+                                      : const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.zero,
+                                        ),
+                                  color: Color(
+                                      int.parse('0xFF${colorList[index]}')),
                                 ),
-                                // ),
                               ),
                             ));
                   },
                 ))
           ],
         ));
-    // return
-    // SizedBox(
-    //   height: 30,
-    //   width: 250,
-    //   child: ListView.builder(
-    //       scrollDirection: Axis.horizontal,
-    //       itemCount: colorList.length,
-    //       shrinkWrap: true,
-    //       itemBuilder: (context, index) => InkWell(
-    //             onTap: () {
-    //               setState(() {
-    //                 colorSelectedIndex = index;
-    //                 colorSelect = colorList[index];
-    //               });
-    //             },
-    //             child: Container(
-    //               width: 30,
-    //               height: 30,
-    //               decoration: BoxDecoration(
-    //                 border: colorSelectedIndex == index
-    //                     ? Border.all(color: Colors.red, width: 2)
-    //                     : null,
-    //                 borderRadius: BorderRadius.zero,
-    //               ),
-    //               child: SizedBox(
-    //                 width: 30,
-    //                 height: 30,
-    //                 child: Card(
-    //                   shape: const RoundedRectangleBorder(
-    //                     borderRadius: BorderRadius.zero,
-    //                   ),
-    //                   color: Color(int.parse('0xFF${colorList[index]}')),
-    //                 ),
-    //               ),
-    //             ),
-    //           )),
-    // );
   }
 
 //尺寸按鈕
