@@ -1,6 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stylish_flutter/detail/detail_bloc.dart';
 import 'package:stylish_flutter/detail/detail_page.dart';
+import 'package:stylish_flutter/home/home_bloc.dart';
+import 'package:stylish_flutter/home/home_event.dart';
+import 'package:stylish_flutter/home/home_state.dart';
 import 'package:stylish_flutter/models/product.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,134 +20,73 @@ class _HomePageState extends State<HomePage> {
     return MediaQuery.of(context).size.width < 600;
   }
 
-  final dio = Dio();
-  void getHttp() async {
-    final response = await dio.get('https://api.appworks-school.tw/api/1.0/products/women');
-    // print(response);
-    print('go here!!');
-}
-
-  //假資料
-  final List<Product> products = [
-    Product(
-        title: '男士休閒外套',
-        id: 'men_jacket_001',
-        category: 'Men',
-        stock: {
-          '697723': {'M': 0, 'L': 20},
-          'E36F10': {'M': 5, 'L': 15},
-        },
-        price: '1500'),
-    Product(
-        title: '男士休閒上衣',
-        id: 'men_jacket_002',
-        category: 'Men',
-        stock: {
-          'E36F10': {'M': 10, 'L': 20},
-          'C98E5D': {'M': 5, 'L': 15},
-          '697723': {'M': 0, 'L': 5},
-        },
-        price: '1500'),
-    Product(
-        title: '女士迷你洋裝',
-        id: 'women_dress_003',
-        category: 'Women',
-        stock: {
-          'C98E5D': {'S': 15, 'M': 10},
-        },
-        price: '1200'),
-    Product(
-        title: '女士迷你洋裝',
-        id: 'women_dress_004',
-        category: 'Women',
-        stock: {
-          'C98E5D': {'S': 15, 'M': 10},
-          'E36F10': {'M': 10, 'L': 20},
-          '697723': {'M': 0, 'L': 5},
-        },
-        price: '1200'),
-    Product(
-        title: '女士迷你洋裝',
-        id: 'women_dress_001',
-        category: 'Women',
-        stock: {
-          'C98E5D': {'S': 15, 'M': 10},
-          '697723': {'M': 0, 'L': 5},
-        },
-        price: '1200'),
-    Product(
-        title: '女士迷你洋裝2',
-        id: 'women_dress_002',
-        category: 'Women',
-        stock: {
-          'E36F10': {'S': 15, 'M': 10},
-          '697723': {'S': 5, 'M': 0},
-        },
-        price: '1200'),
-    Product(
-        title: '經典手錶',
-        id: 'watch_001',
-        category: 'Access',
-        stock: {
-          'C98E5D': {'F': 0},
-          'E36F10': {'F': 20},
-        },
-        price: '5000'),
-    Product(
-        title: '經典手錶2',
-        id: 'watch_002',
-        category: 'Access',
-        stock: {
-          'C98E5D': {'F': 50},
-        },
-        price: '5000'),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          flex: 3,
-          child: topHoriListView(),
-        ),
-        Expanded(
-          flex: 7,
-          child: isSmall(context)
-              //小畫面時的View
-              ? SingleChildScrollView(
-                  child: Column(
-                  children: [
-                    ExpansionTile(
-                      title: Text('女裝'),
-                      children: <Widget>[
-                        productVertiListView('Women', products),
-                      ],
-                    ),
-                    ExpansionTile(
-                      title: Text('男裝'),
-                      children: <Widget>[
-                        productVertiListView('Men', products),
-                      ],
-                    ),
-                    ExpansionTile(
-                      title: Text('配件'),
-                      children: <Widget>[
-                        productVertiListView('Access', products),
-                      ],
-                    ),
-                  ],
-                ))
+    return BlocProvider<HomeBloc>(
+        create: (_) => HomeBloc(Repository())..add(CallApiEvent(Cate.All)),
+        child: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+          if (state is ProductLoadingState) {
+            print('go progress');
+            return Center(child: CircularProgressIndicator());
+          } else if (state is ProductsErrorState) {
+            print('go error');
+            return Center(child: Text(state.error));
+          } else if (state is ProductsLoadedState) {
+            final products = state.products;
+            print('size = ${products.length}');
+            return Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: topHoriListView(),
+                ),
+                Expanded(
+                  flex: 7,
+                  child: isSmall(context)
+                      //小畫面時的View
+                      ? SingleChildScrollView(
+                          child: Column(
+                          children: [
+                            ExpansionTile(
+                              title: Text('女裝'),
+                              children: <Widget>[
+                                productVertiListView(Cate.Women, state.products),
+                              ],
+                            ),
+                            ExpansionTile(
+                              title: Text('男裝'),
+                              children: <Widget>[
+                                productVertiListView(Cate.Men, state.products),
+                              ],
+                            ),
+                            ExpansionTile(
+                              title: Text('配件'),
+                              children: <Widget>[
+                                productVertiListView(Cate.Access, state.products),
+                              ],
+                            ),
+                          ],
+                        ))
 
-              //這是大畫面時的view
-              : Row(children: [
-                  Expanded(child: categoryVertiListView('Women', products)),
-                  Expanded(child: categoryVertiListView('Men', products)),
-                  Expanded(child: categoryVertiListView('Access', products)),
-                ]),
-        )
-      ],
-    );
+                      //這是大畫面時的view
+                      : Row(children: [
+                          Expanded(
+                              child:
+                                  categoryVertiListView(Cate.Women, state.products)),
+                          Expanded(
+                              child:
+                                  categoryVertiListView(Cate.Men, state.products)),
+                          Expanded(
+                              child:
+                                  categoryVertiListView(Cate.Access, state.products)),
+                        ]),
+                )
+              ],
+            );
+          } else {
+            return SizedBox.shrink();
+          }
+        }));
   }
 
 // 上方水平畫面元件區
@@ -172,7 +118,7 @@ class _HomePageState extends State<HomePage> {
 
 //下方畫面元件區
   Widget productCard(Product product) {
-    getHttp();
+    // print('item $product');
     return SizedBox(
       width: 300,
       height: 180,
@@ -184,12 +130,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                   flex: 4,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomLeft: Radius.circular(20),
+                  child: CachedNetworkImage(
+                    imageUrl: product.mainImage,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                    imageBuilder: (context, imageProvider) => Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
+                        ),
                       ),
                     ),
                   )),
@@ -212,9 +165,23 @@ class _HomePageState extends State<HomePage> {
   }
 
 //垂直商品卡片ListView
-  Widget productVertiListView(String category, List<Product> products) {
-    var filterProducts =
-        products.where((product) => product.category == category).toList();
+  Widget productVertiListView(Cate category, List<Product> products) {
+    print('listView = $products');
+    String categoryStr = '';
+    switch(category) {
+      case Cate.All: 
+      categoryStr = 'all'; break;
+      case Cate.Women: 
+      categoryStr = 'women'; break;
+      case Cate.Men: 
+      categoryStr = 'men'; break;
+      case Cate.Access: 
+      categoryStr = 'accessories'; break;
+      default: 
+      categoryStr = ''; break;
+    }
+
+    var filterProducts = products.where((product) => product.category == categoryStr).toList();
 
     return ListView.builder(
       shrinkWrap: true,
@@ -237,19 +204,36 @@ class _HomePageState extends State<HomePage> {
   }
 
 //類別+商品卡ListView
-  Widget categoryVertiListView(String category, List<Product> products) {
-    var filterProducts =
-        products.where((product) => product.category == category).toList();
-    String categoryText = category == 'Men'
-        ? '男裝'
-        : category == 'Women'
-            ? '女裝'
-            : category == 'Access'
-                ? '配件'
-                : '';
+  Widget categoryVertiListView(Cate category, List<Product> products) {
+    String categoryStr = '';
+    String title = '';
+    switch (category) {
+      case Cate.All:
+        categoryStr = 'all';
+        title = '全部商品';
+        break;
+      case Cate.Women:
+        categoryStr = 'women';
+        title = '女裝';
+        break;
+      case Cate.Men:
+        categoryStr = 'men';
+        title = '男裝';
+        break;
+      case Cate.Access:
+        categoryStr = 'accessories';
+        title = '飾品';
+        break;
+      default:
+        categoryStr = '';
+        title = '';
+        break;
+    }
+
+    var filterProducts = products.where((product) => product.category == categoryStr).toList();
 
     return Column(children: [
-      Text(categoryText),
+      Text(title),
       Expanded(
           child: ListView.builder(
         scrollDirection: Axis.vertical,

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stylish_flutter/detail_page/detail_event.dart';
-import 'package:stylish_flutter/detail_page/detail_state.dart';
+import 'package:stylish_flutter/detail/detail_event.dart';
+import 'package:stylish_flutter/detail/detail_state.dart';
 
 class DetailBloc extends Bloc<DetailEvent, DetailState> {
   DetailBloc() : super(const DetailState()) {

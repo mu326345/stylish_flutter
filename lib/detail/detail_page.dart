@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stylish_flutter/detail_page/detail_bloc.dart';
-import 'package:stylish_flutter/detail_page/detail_event.dart';
-import 'package:stylish_flutter/detail_page/detail_state.dart';
-import 'package:stylish_flutter/home_page.dart';
+import 'package:stylish_flutter/detail/detail_bloc.dart';
+import 'package:stylish_flutter/detail/detail_event.dart';
+import 'package:stylish_flutter/detail/detail_state.dart';
 import '../models/product.dart';
 
 class DetailPage extends StatefulWidget {
@@ -33,15 +32,16 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    colorList = widget.product.stock.keys.toList();
+    colorList = <String>[];
     sizeList = <String>[];
-    widget.product.stock.forEach((key, value) {
-      value.forEach((size, count) {
-        if (!sizeList.contains(size)) {
-          sizeList.add(size);
-        }
-      });
-    });
+    for (var item in widget.product.variants) {
+      if (!colorList.contains(item.colorCode)) {
+        colorList.add(item.colorCode);
+      }
+      if (!sizeList.contains(item.size)) {
+        sizeList.add(item.size);
+      }
+    }
   }
 
   @override
@@ -54,7 +54,7 @@ class _DetailPageState extends State<DetailPage> {
             height: 20,
             alignment: Alignment.center,
           ),
-          backgroundColor: const Color(0xFFEEF1F7),
+          // backgroundColor: const Color(0xFFEEF1F7),
         ),
         body: SingleChildScrollView(
             child: isSmall(context) ? detailAppView() : detailWebView()));
@@ -73,7 +73,7 @@ class _DetailPageState extends State<DetailPage> {
           widget.product.title,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
-        Text(widget.product.id),
+        Text(widget.product.id.toString()),
         const SizedBox(
           height: 16,
         ),
@@ -118,12 +118,11 @@ class _DetailPageState extends State<DetailPage> {
         const SizedBox(
           height: 16,
         ),
-        const Text('實品顏色依單品照為主'),
-        const Text('棉100%'),
-        const Text('厚薄：薄'),
-        const Text('彈性：無'),
-        const Text('素材產地/日本'),
-        const Text('加工產地/日本'),
+        Text(widget.product.note),
+        Text(widget.product.texture),
+        Text(widget.product.description),
+        Text(widget.product.place),
+        Text(widget.product.wash),
         listPhoto()
       ]),
     );
@@ -159,7 +158,7 @@ class _DetailPageState extends State<DetailPage> {
                                     fontWeight: FontWeight.bold, fontSize: 24),
                               ),
                               Text(
-                                widget.product.id,
+                                widget.product.id.toString(),
                               ),
                               const SizedBox(
                                 height: 16,
@@ -305,11 +304,14 @@ class _DetailPageState extends State<DetailPage> {
           },
           itemBuilder: (ontext, index) {
             final size = sizeList[index];
-            // final stock = widget.product.stock[colorSelect]![size] ?? 0;
-            final stock =
-                widget.product.stock[colorSelect]?.containsKey(size) == true
-                    ? widget.product.stock[colorSelect]![size]
-                    : 0;
+            int stock = 0;
+            widget.product.variants.forEach((item) {
+              if (item.colorCode == colorSelect) {
+                stock = item.stock;
+              } else {
+                stock = 0;
+              }
+            });
 
             if (colorSelect == '') {
               return ElevatedButton(
@@ -322,7 +324,7 @@ class _DetailPageState extends State<DetailPage> {
                 child: Text(size),
                 onPressed: () => {},
               );
-            } else if (stock! > 0) {
+            } else if (stock > 0) {
               return ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   primary: sizeSelectedIndex == index
@@ -406,7 +408,7 @@ class _DetailPageState extends State<DetailPage> {
 
 //網頁下方畫面
 Widget listPhoto() {
-  Shader linearGradient = const LinearGradient(
+  Shader linearGradient = LinearGradient(
     colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
   ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
