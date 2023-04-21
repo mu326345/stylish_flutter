@@ -26,19 +26,15 @@ class _HomePageState extends State<HomePage> {
         create: (_) => HomeBloc(Repository())..add(CallApiEvent(Cate.All)),
         child: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
           if (state is ProductLoadingState) {
-            print('go progress');
             return Center(child: CircularProgressIndicator());
           } else if (state is ProductsErrorState) {
-            print('go error');
             return Center(child: Text(state.error));
           } else if (state is ProductsLoadedState) {
-            final products = state.products;
-            print('size = ${products.length}');
             return Column(
               children: [
                 Expanded(
                   flex: 3,
-                  child: topHoriListView(),
+                  child: topHoriListView(state.hotsProducts),
                 ),
                 Expanded(
                   flex: 7,
@@ -50,19 +46,19 @@ class _HomePageState extends State<HomePage> {
                             ExpansionTile(
                               title: Text('女裝'),
                               children: <Widget>[
-                                productVertiListView(Cate.Women, state.products),
+                                productVertiListView(state.womenProducts),
                               ],
                             ),
                             ExpansionTile(
                               title: Text('男裝'),
                               children: <Widget>[
-                                productVertiListView(Cate.Men, state.products),
+                                productVertiListView(state.menProducts),
                               ],
                             ),
                             ExpansionTile(
                               title: Text('配件'),
                               children: <Widget>[
-                                productVertiListView(Cate.Access, state.products),
+                                productVertiListView(state.accessProducts),
                               ],
                             ),
                           ],
@@ -72,13 +68,13 @@ class _HomePageState extends State<HomePage> {
                       : Row(children: [
                           Expanded(
                               child:
-                                  categoryVertiListView(Cate.Women, state.products)),
+                                  categoryVertiListView(Cate.Women, state.womenProducts)),
                           Expanded(
                               child:
-                                  categoryVertiListView(Cate.Men, state.products)),
+                                  categoryVertiListView(Cate.Men, state.menProducts)),
                           Expanded(
                               child:
-                                  categoryVertiListView(Cate.Access, state.products)),
+                                  categoryVertiListView(Cate.Access, state.accessProducts)),
                         ]),
                 )
               ],
@@ -90,7 +86,7 @@ class _HomePageState extends State<HomePage> {
   }
 
 // 上方水平畫面元件區
-  Widget topImageCard() {
+  Widget topImageCard(Product item) {
     return SizedBox(
       width: 300,
       height: 250,
@@ -99,26 +95,35 @@ class _HomePageState extends State<HomePage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Image.asset(
-          'images/Image_Logo02.png',
-          fit: BoxFit.contain,
-        ),
+        child: CachedNetworkImage(
+                    imageUrl: item.mainImage,
+                    imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ))),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  )
       ),
     );
   }
 
-  Widget topHoriListView() {
+  Widget topHoriListView(List<Product> hots) {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
-      itemCount: 6,
-      itemBuilder: (context, index) => topImageCard(),
+      itemCount: hots.length,
+      itemBuilder: (context, index) => topImageCard(hots[index]),
       padding: EdgeInsets.all(5),
     );
   }
 
 //下方畫面元件區
   Widget productCard(Product product) {
-    // print('item $product');
     return SizedBox(
       width: 300,
       height: 180,
@@ -132,19 +137,20 @@ class _HomePageState extends State<HomePage> {
                   flex: 4,
                   child: CachedNetworkImage(
                     imageUrl: product.mainImage,
-                    fit: BoxFit.cover,
+                    imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(20)
+                            ),
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ))),
                     placeholder: (context, url) =>
                         const CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
-                    imageBuilder: (context, imageProvider) => Container(
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
-                        ),
-                      ),
-                    ),
                   )),
               Expanded(
                   flex: 6,
@@ -165,37 +171,20 @@ class _HomePageState extends State<HomePage> {
   }
 
 //垂直商品卡片ListView
-  Widget productVertiListView(Cate category, List<Product> products) {
-    print('listView = $products');
-    String categoryStr = '';
-    switch(category) {
-      case Cate.All: 
-      categoryStr = 'all'; break;
-      case Cate.Women: 
-      categoryStr = 'women'; break;
-      case Cate.Men: 
-      categoryStr = 'men'; break;
-      case Cate.Access: 
-      categoryStr = 'accessories'; break;
-      default: 
-      categoryStr = ''; break;
-    }
-
-    var filterProducts = products.where((product) => product.category == categoryStr).toList();
-
+  Widget productVertiListView(List<Product> products) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
-      itemCount: filterProducts.length,
+      itemCount: products.length,
       itemBuilder: (context, index) => InkWell(
-        child: productCard(filterProducts[index]),
+        child: productCard(products[index]),
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => DetailPage(
-                        product: filterProducts[index],
+                        product: products[index],
                       )));
         },
       ),
@@ -209,43 +198,36 @@ class _HomePageState extends State<HomePage> {
     String title = '';
     switch (category) {
       case Cate.All:
-        categoryStr = 'all';
         title = '全部商品';
         break;
       case Cate.Women:
-        categoryStr = 'women';
         title = '女裝';
         break;
       case Cate.Men:
-        categoryStr = 'men';
         title = '男裝';
         break;
       case Cate.Access:
-        categoryStr = 'accessories';
         title = '飾品';
         break;
       default:
-        categoryStr = '';
         title = '';
         break;
     }
-
-    var filterProducts = products.where((product) => product.category == categoryStr).toList();
 
     return Column(children: [
       Text(title),
       Expanded(
           child: ListView.builder(
         scrollDirection: Axis.vertical,
-        itemCount: filterProducts.length,
+        itemCount: products.length,
         itemBuilder: (context, index) => InkWell(
-          child: productCard(filterProducts[index]),
+          child: productCard(products[index]),
           onTap: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        DetailPage(product: filterProducts[index])));
+                        DetailPage(product: products[index])));
           },
         ),
         padding: const EdgeInsets.all(5),

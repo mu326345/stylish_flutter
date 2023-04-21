@@ -11,11 +11,20 @@ class ProductLoadingState extends HomeState {
 }
 
 class ProductsLoadedState extends HomeState {
-  ProductsLoadedState(this.products);
-  final List<Product> products;
+  ProductsLoadedState(
+    this.womenProducts,
+    this.menProducts,
+    this.accessProducts,
+    this.hotsProducts,
+  );
+  final List<Product> womenProducts;
+  final List<Product> menProducts;
+  final List<Product> accessProducts;
+  final List<Product> hotsProducts;
+
   
   @override
-  List<Object?> get props => [products];
+  List<Object?> get props => [womenProducts, menProducts, accessProducts, hotsProducts];
 }
 
 class ProductsErrorState extends HomeState {

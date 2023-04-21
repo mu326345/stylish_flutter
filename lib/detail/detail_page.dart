@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stylish_flutter/detail/detail_bloc.dart';
@@ -17,7 +18,6 @@ class _DetailPageState extends State<DetailPage> {
   final bloc = DetailBloc();
 
   int sizeSelectedIndex = -1;
-  // int colorSelectedIndex = -1;
   String colorSelect = '';
   int quantity = 1;
   late ValueChanged<int> onChanged;
@@ -54,7 +54,6 @@ class _DetailPageState extends State<DetailPage> {
             height: 20,
             alignment: Alignment.center,
           ),
-          // backgroundColor: const Color(0xFFEEF1F7),
         ),
         body: SingleChildScrollView(
             child: isSmall(context) ? detailAppView() : detailWebView()));
@@ -64,14 +63,22 @@ class _DetailPageState extends State<DetailPage> {
     return Container(
       margin: const EdgeInsets.fromLTRB(70, 40, 70, 40),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          color: Colors.blue,
+        CachedNetworkImage(
           width: double.infinity,
           height: 500,
+          imageUrl: widget.product.mainImage,
+          imageBuilder: (context, imageProvider) => Container(
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                  ))),
+          placeholder: (context, url) => const CircularProgressIndicator(),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
         Text(
           widget.product.title,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
         ),
         Text(widget.product.id.toString()),
         const SizedBox(
@@ -123,12 +130,13 @@ class _DetailPageState extends State<DetailPage> {
         Text(widget.product.description),
         Text(widget.product.place),
         Text(widget.product.wash),
-        listPhoto()
+        listPhoto(widget.product.images)
       ]),
     );
   }
 
   Widget detailWebView() {
+    print(widget.product.mainImage);
     return Container(
         margin: const EdgeInsets.fromLTRB(80, 40, 80, 40),
         child: Column(
@@ -136,10 +144,20 @@ class _DetailPageState extends State<DetailPage> {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    color: Colors.blue,
+                  child: CachedNetworkImage(
                     width: double.infinity,
                     height: 500,
+                    imageUrl: widget.product.mainImage,
+                    imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ))),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
                   ),
                 ),
                 Expanded(
@@ -223,7 +241,7 @@ class _DetailPageState extends State<DetailPage> {
               ],
             ),
             //下半段的文字及照片
-            listPhoto()
+            listPhoto(widget.product.images)
           ],
         ));
   }
@@ -407,8 +425,8 @@ class _DetailPageState extends State<DetailPage> {
 }
 
 //網頁下方畫面
-Widget listPhoto() {
-  Shader linearGradient = LinearGradient(
+Widget listPhoto(List<String> images) {
+  Shader linearGradient = const LinearGradient(
     colors: <Color>[Color.fromARGB(255, 0, 110, 254), Colors.green],
   ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
@@ -443,20 +461,34 @@ Widget listPhoto() {
         const SizedBox(
           height: 16,
         ),
+        //TODO: ListView 在滑動的時候會有UI卡頓問題待解決
         ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: 5,
-            shrinkWrap: true,
-            // ignore: prefer_const_constructors
-            itemBuilder: (context, index) => SizedBox(
-                  width: double.infinity,
-                  height: 500,
-                  child: const Card(
-                    shape:
-                        RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                    color: Colors.blue,
-                  ),
-                )),
+          scrollDirection: Axis.vertical,
+          itemCount: images.length,
+          shrinkWrap: true,
+          // ignore: prefer_const_constructors
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: SizedBox(
+              height: 500,
+              child: CachedNetworkImage(
+                width: double.infinity,
+                height: 500,
+                imageUrl: images[index],
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                  )),
+                ),
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              ),
+            ),
+          ),
+        ),
       ],
     ),
   );

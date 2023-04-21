@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -13,9 +14,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<CallApiEvent>((event, emit) async {
       emit(ProductLoadingState());
       try {
-        final product = await repository.getProducts(Cate.All);
-        emit(ProductsLoadedState(product));
-      } catch (e) {
+        final womenResponse = await repository.getProducts(Cate.Women);
+        final menResponse = await repository.getProducts(Cate.Men);
+        final accessResponse = await repository.getProducts(Cate.Access);
+        final hotsResponse = await repository.getProducts(Cate.Hots);
+        emit(ProductsLoadedState(womenResponse, menResponse, accessResponse, hotsResponse));
+      } catch (e, stacktrace) {
+        print(stacktrace);
         emit(ProductsErrorState(e.toString()));
       }
     },);
@@ -24,7 +29,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
 class Repository {
   final dio = Dio(BaseOptions(
-      baseUrl: 'https://api.appworks-school.tw/api/1.0/products/',
+      baseUrl: 'https://api.appworks-school.tw/api/1.0/',
       responseType: ResponseType.json))
     ..interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
@@ -44,26 +49,34 @@ class Repository {
     String categoryStr = '';
     switch(category) {
       case Cate.All: 
-      categoryStr = 'all'; break;
+      categoryStr = 'products/all'; break;
       case Cate.Women: 
-      categoryStr = 'women'; break;
+      categoryStr = 'products/women'; break;
       case Cate.Men: 
-      categoryStr = 'men'; break;
+      categoryStr = 'products/men'; break;
       case Cate.Access: 
-      categoryStr = 'accessories'; break;
+      categoryStr = 'products/accessories'; break;
+      case Cate.Hots: 
+      categoryStr = 'marketing/hots'; break;
       default: 
       categoryStr = ''; break;
     }
 
     final response = await dio.get(categoryStr);
-    final responsePage = response.data['next_paging']; //TODO: 要下載全部頁面
 
     if (response.statusCode == 200) {
-      final responseData = response.data['data'];
+      dynamic responseData = response.data['data'];
+
+      // 判斷回傳資料是hots 還是其他 
+      if (responseData is List) {
+        var isHots = responseData[0]['products'] != null;
+        if (isHots) { 
+          responseData = responseData[0]['products'];
+        }
+      }
       
-      print(responsePage);
-      final List<Product> productsparseData = responseData.map<Product>((json) => 
-        Product.fromJson(json)).toList();
+      final List<Product> productsparseData =
+          responseData.map<Product>((json) => Product.fromJson(json)).toList();
       return productsparseData;
     } else {
       throw Exception('Failed to load products');
@@ -76,4 +89,5 @@ class Repository {
   Women,
   Men,
   Access,
+  Hots
 }

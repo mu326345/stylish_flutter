@@ -46,7 +46,7 @@ class Product {
 
     final List<dynamic> imagesJson = json['images'];
     final List<String> images = imagesJson
-    .map((imageJson) => imageJson.toString()).toList();
+    .map((imagesJson) => imagesJson.toString()).toList();
 
     return Product(
       id: json['id'], 
