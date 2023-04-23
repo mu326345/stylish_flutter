@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stylish_flutter/detail/detail_bloc.dart';
 import 'package:stylish_flutter/detail/detail_event.dart';
 import 'package:stylish_flutter/detail/detail_state.dart';
+import 'package:stylish_flutter/pay/pay_page.dart';
 import '../models/product.dart';
 
 class DetailPage extends StatefulWidget {
@@ -61,7 +62,7 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget detailAppView() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(70, 40, 70, 40),
+      margin: const EdgeInsets.fromLTRB(40, 30, 40, 30),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         CachedNetworkImage(
           width: double.infinity,
@@ -118,7 +119,8 @@ class _DetailPageState extends State<DetailPage> {
             minimumSize: const Size(350, 60),
           ),
           onPressed: () {
-            // TODO: Add onPressed action
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => PayPage()));
           },
           child: const Text('請選擇尺寸'),
         ),
@@ -136,7 +138,6 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget detailWebView() {
-    print(widget.product.mainImage);
     return Container(
         margin: const EdgeInsets.fromLTRB(80, 40, 80, 40),
         child: Column(
@@ -222,7 +223,10 @@ class _DetailPageState extends State<DetailPage> {
                                   minimumSize: const Size(350, 60),
                                 ),
                                 onPressed: () {
-                                  // TODO: Add onPressed action
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PayPage()));
                                 },
                                 child: const Text('請選擇尺寸'),
                               ),
@@ -268,7 +272,7 @@ class _DetailPageState extends State<DetailPage> {
             straightLine(),
             SizedBox(
                 height: 30,
-                width: 250,
+                width: 230,
                 child: BlocBuilder<DetailBloc, DetailState>(
                   builder: (context, state) {
                     return ListView.builder(
@@ -310,7 +314,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget listSizeBtn(List<String> sizeList) {
     return SizedBox(
       height: 30,
-      width: 250,
+      width: 230,
       child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: sizeList.length,
@@ -373,6 +377,8 @@ class _DetailPageState extends State<DetailPage> {
                     child: Text(size),
                   ),
                   const Positioned(
+                    top: 30 / 2 - 8,
+                    left: 60 / 2 - 8,
                     child: Align(
                       alignment: Alignment.center,
                       child: Text(
@@ -380,8 +386,6 @@ class _DetailPageState extends State<DetailPage> {
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
-                    top: 30 / 2 - 8,
-                    left: 60 / 2 - 8,
                   ),
                 ],
               );
@@ -393,7 +397,7 @@ class _DetailPageState extends State<DetailPage> {
 //數量按鈕
   Widget quantityButton({required Null Function(int value) onChanged}) {
     return SizedBox(
-      width: 250,
+      width: 230,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
