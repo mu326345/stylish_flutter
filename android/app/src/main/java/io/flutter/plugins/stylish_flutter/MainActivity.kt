@@ -1,4 +1,4 @@
-package com.example.stylish_flutter
+package io.flutter.plugins.stylish_flutter
 
 import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
