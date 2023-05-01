@@ -10,10 +10,21 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   late GoogleMapController mapController;
 
-  final LatLng _center = const LatLng(23.986783, 121.383956);
+  final LatLng _center = const LatLng(25.031421, 121.566013);
+  final Map<String, Marker> _markers = {};
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+
+    final marker = Marker(
+        markerId: MarkerId('AppWorks'),
+        position: const LatLng(25.038601, 121.532356),
+        infoWindow: const InfoWindow(
+            title: 'AppWorks School', snippet: '100台北市中正區仁愛路二段99號'));
+
+    setState(() {
+      _markers['AppWorks'] = marker;
+    });
   }
 
   @override
@@ -26,9 +37,10 @@ class _MapPageState extends State<MapPage> {
             centerTitle: true,
           ),
           body: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition:
-                  CameraPosition(target: _center, zoom: 8.0))),
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(target: _center, zoom: 11.0),
+            markers: Set<Marker>.of(_markers.values),
+          )),
     );
   }
 }
