@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:stylish_flutter/arr_page.dart';
 import 'package:stylish_flutter/home/home_page.dart';
 import 'package:stylish_flutter/map/map_page.dart';
 import 'package:stylish_flutter/pay/pay_page.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/map': (context) => MapPage(),
           '/pay': (context) => PayPage(),
+          '/arr': (context) => ArrPage()
         },
         home: Builder(
           builder: (context) => Scaffold(
@@ -43,7 +45,17 @@ class MyApp extends StatelessWidget {
                   },
                   icon: Icon(Icons.add_shopping_cart),
                   color: Colors.black,
-                )
+                ),
+                //AR
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/arr');
+                  },
+                  child: Text(
+                    'AR',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
               ],
             ),
             body: HomePage(),
